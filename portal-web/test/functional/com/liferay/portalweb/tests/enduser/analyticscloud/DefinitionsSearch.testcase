@@ -27,6 +27,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8779 | Test Summary: Add search query parameters"
 	@priority = "5"
 	test CanAddSearchQueryParameters {
+		property portal.upstream = "Mathaus";
+
 		ACDefinitions.addSearchQuerySuccessfully(query = "Test Query");
 
 		ACDefinitions.goToDefinitionType(definitionType = "Search");
@@ -37,6 +39,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8780 | Test Summary: Delete search query parameters"
 	@priority = "5"
 	test CanDeleteSearchQueryParameters {
+		property portal.upstream = "Mathaus";
+
 		ACDefinitions.addSearchQuerySuccessfully(query = "Test Query");
 
 		ACDefinitions.goToDefinitionType(definitionType = "Search");
@@ -65,6 +69,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8782 | Test Summary: Maximum 5 search query strings"
 	@priority = "4"
 	test CantSearchMoreThanFiveSearchQueryStrings {
+		property portal.upstream = "Mathaus";
+
 		var varList = "Test Query 1,Test Query 2,Test Query 3,Test Query 4,Test Query 5";
 
 		ACDefinitions.addMultipleSearchQuerySuccessfully(query_list = "${varList}");
