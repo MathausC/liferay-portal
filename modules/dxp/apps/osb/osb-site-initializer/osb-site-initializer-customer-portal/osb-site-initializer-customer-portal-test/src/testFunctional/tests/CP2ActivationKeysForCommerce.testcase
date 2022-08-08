@@ -91,6 +91,7 @@ definition {
 	@description = "LPS-146072 - Verify that when selecting the 'Commerce' product the 'Activation Keys' page opens"
 	@priority = "4"
 	test CanViewActivationKeysPage {
+		property portal.upstream = "mathaus";
 		var accountsList = "7.4,7.3,7.2,7.1,7.0";
 
 		for (var account : list "${accountsList}") {
@@ -99,9 +100,8 @@ definition {
 
 				CP2NavigationMenu.goToProductActivation();
 			}
-			
-			task ("Assert that project has DXP ${account}") {
 
+			task ("Assert that project has DXP ${account}") {
 				CP2NavigationMenu.clickOnProductButton(product = "DXP");
 
 				CP2ActivationKeys.assertDropDownSelection(option = "${account}");
@@ -122,6 +122,7 @@ definition {
 	}
 
 	test CanViewActivationTextWhenTheVersionHasNoValue {
+		property portal.upstream = "mathaus";
 		var accountsList = "7.4,7.3";
 
 		for (var account : list "${accountsList}") {
@@ -130,9 +131,8 @@ definition {
 
 				CP2NavigationMenu.goToProductActivation();
 			}
-			
-			task ("Assert that project has DXP ${account}") {
 
+			task ("Assert that project has DXP ${account}") {
 				CP2NavigationMenu.clickOnProductButton(product = "DXP");
 
 				CP2ActivationKeys.assertDropDownSelection(option = "${account}");
