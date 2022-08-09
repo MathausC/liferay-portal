@@ -12,6 +12,7 @@ definition {
 	var testSiteTamplate = "Liferay OSB Site Initializer Customer Portal";
 	var pageTitle = "Activation Keys";
 	var testUser = "Test Test";
+	var userFirstName = "Test";
 
 	setUp {
 		task ("Set up instance and sign in") {
@@ -31,7 +32,7 @@ definition {
 		task ("Go to Customer Portal") {
 			ApplicationsMenu.gotoSite(key_site = "${testSiteName}");
 
-			CustomerPortal.waitCP20PageToLoad(title = "${testUser}");
+			CustomerPortal.waitCP20PageToLoad(userFirstName = "${userFirstName}");
 		}
 	}
 
@@ -116,7 +117,7 @@ definition {
 			task ("Go to Customer Portal") {
 				ApplicationsMenu.gotoSite(key_site = "${testSiteName}");
 
-				CustomerPortal.waitCP20PageToLoad(title = "${testUser}");
+				CustomerPortal.waitCP20PageToLoad(userFirstName = "${userFirstName}");
 			}
 		}
 	}
@@ -160,7 +161,7 @@ definition {
 			task ("Go to Customer Portal") {
 				ApplicationsMenu.gotoSite(key_site = "${testSiteName}");
 
-				CustomerPortal.waitCP20PageToLoad(title = "${testUser}");
+				CustomerPortal.waitCP20PageToLoad(userFirstName = "${userFirstName}");
 			}
 		}
 	}
@@ -277,6 +278,8 @@ definition {
 
 		task ("Go to Customer Portal") {
 			ApplicationsMenu.gotoSite(key_site = "${testSiteName}");
+
+			CustomerPortal.waitCP20PageToLoad(userFirstName = "${userFirstName}");
 		}
 
 		task ("Assert that project has DXP 7.0") {
