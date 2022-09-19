@@ -80,6 +80,8 @@ definition {
 	@description = "Automation ID: LPS-144976 | Test Summary: Verify if the user can choose an option at Disaster Recovery Data Center Region"
 	@priority = "5"
 	test CanChooseDisasterRecoveryDataCenter {
+		property portal.upstream = "mathaus";
+
 		task ("Activate object for disaster data center region") {
 			CP2DXPCloudSetup.activeDisasterRecoveryDataCenter();
 		}
