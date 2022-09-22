@@ -56,6 +56,8 @@ definition {
     @description = "Automation Ticket: LPS-147800 | Test Summary: Verify if the card displays (SLA Card - SLA Name - Start Date - End Date - SLA Status)"
     @priority = "4"
     test AssertAllTitlesOnTheSLACard {
+        property portal.upstream = "mathaus";
+
 		task ("Given I go to the test account") {
 			CustomerPortal.search(searchItem = "${testAccount1}");
 
@@ -76,20 +78,6 @@ definition {
             CP2Overview.switchSLACard();
         }
 
-        task ("Then I should be able to view SLA Title, Status, Start Date and End Date for Gold Support License.") {
-            CP2Overview.assertSLACardContentIsVisible(cardContent = "Gold");
-
-            CP2Overview.assertSLACardContentIsVisible(cardContent = "FUTURE");
-
-            CP2Overview.assertSLACardContentIsVisible(cardContent = "08/24/2022 - 08/24/2023");
-
-            CP2Overview.assertSLACardBackgroundColor(slaCardTitle = "Gold");
-        }
-
-        task ("When I shif the SLA card") {
-            CP2Overview.switchSLACard();
-        }
-
         task ("Then I should be able to view SLA Title, Status, Start Date and End Date for Premium Support License.") {
             CP2Overview.assertSLACardContentIsVisible(cardContent = "Premium");
 
@@ -99,11 +87,27 @@ definition {
 
             CP2Overview.assertSLACardBackgroundColor(slaCardTitle = "Premium");
         }
+
+        task ("When I shif the SLA card") {
+            CP2Overview.switchSLACard();
+        }
+
+        task ("Then I should be able to view SLA Title, Status, Start Date and End Date for Gold Support License.") {
+            CP2Overview.assertSLACardContentIsVisible(cardContent = "Gold");
+
+            CP2Overview.assertSLACardContentIsVisible(cardContent = "FUTURE");
+
+            CP2Overview.assertSLACardContentIsVisible(cardContent = "08/24/2022 - 08/24/2023");
+
+            CP2Overview.assertSLACardBackgroundColor(slaCardTitle = "Gold");
+        }
     }
 
     @description = "Automation Ticket: LPS-147801 | Test Summary: Verify if when user has multiple statuses, the status order went from highest to lowest (Current > Future > Expired)."
     @priority = "5"
     test StatusOrderFromHighestToLowest {
+        property portal.upstream = "mathaus";
+
         task ("Given I go to the test account") {
 			CustomerPortal.search(searchItem = "${testAccount1}");
 
@@ -118,22 +122,24 @@ definition {
             CP2Overview.switchSLACard();
         }
 
-        task ("Then I should be able to view SLA Status Future") {
-            CP2Overview.assertSLACardContentIsVisible(cardContent = "FUTURE");
+        task ("Then I should be able to view SLA Status Expired") {
+            CP2Overview.assertSLACardContentIsVisible(cardContent = "EXPIRED");
         }
 
         task ("When I shif the SLA card") {
             CP2Overview.switchSLACard();
         }
 
-        task ("Then I should be able to view SLA Status Expired") {
-            CP2Overview.assertSLACardContentIsVisible(cardContent = "EXPIRED");
+        task ("Then I should be able to view SLA Status Future") {
+            CP2Overview.assertSLACardContentIsVisible(cardContent = "FUTURE");
         }
     }
 
     @description = "Automation Ticket: LPS-147802 | Test Summary: Check if the user can switch between SLA cards."
     @priority = "5"
     test UserCanSwitchBetweenSLACards {
+        property portal.upstream = "mathaus";
+
         task ("Given I go to the test account") {
 			CustomerPortal.search(searchItem = "${testAccount1}");
 
@@ -148,16 +154,16 @@ definition {
             CP2Overview.switchSLACard();
         }
 
-        task ("Then I should be able to view SLA Title Gold") {
-            CP2Overview.assertSLACardContentIsVisible(cardContent = "Gold");
+        task ("Then I should be able to view SLA Title Premium") {
+            CP2Overview.assertSLACardContentIsVisible(cardContent = "Premium");
         }
 
         task ("When I shif the SLA card") {
             CP2Overview.switchSLACard();
         }
 
-        task ("Then I should be able to view SLA Title Premium") {
-            CP2Overview.assertSLACardContentIsVisible(cardContent = "Premium");
+        task ("Then I should be able to view SLA Title Gold") {
+            CP2Overview.assertSLACardContentIsVisible(cardContent = "Gold");
         }
 
         task ("When I shif the SLA card") {
@@ -172,6 +178,8 @@ definition {
     @description = "Automation Ticket: LPS-147803 | Test Summary: Verify the message 'The project's Support Level is displayed here for projects with ticketing support.' if there is no SLA on the project"
     @priority = "4"
     test CanViewErrorMessageIfThereIsNoSLAInTheProject {
+        property portal.upstream = "mathaus";
+
         task ("Given I go to the test account") {
 			CustomerPortal.search(searchItem = "${testAccount2}");
 
@@ -188,6 +196,8 @@ definition {
     @description = "Automation Ticket: LPS-147804 | Test Summary: Check if when cards have the same support level the previous deadline date is extended."
     @priority = "4"
     test CardsAtTheSameSupportLevelThePreviousDeadlineIsExtended {
+        property portal.upstream = "mathaus";
+
         task("Given I get the start date of oldest license") {
             var startDate = CustomerPortal.getValueFieldKoroneikiByAccountName(
                 field = "SLA Expired Start Date",
