@@ -1,0 +1,77 @@
+definition {
+
+    macro goToCustomScreen {
+
+    Click(locator1 = "MyTestFile#OPEN_SIMULATION");
+
+    Click(locator1 = "MyTestFile#CUSTOM_SCREEN");
+
+    }
+
+    macro customHeight {
+
+    Click(locator1 = "MyTestFile#CUSTOM_HEIGHT");
+
+    Type(
+			locator1 = "MyTestFile#CUSTOM_HEIGHT",
+			value1 = ${customHeight});
+
+    KeyPress(
+			locator1 = "MyTestFile#CUSTOM_HEIGHT",
+			value1 = "\LEFT");
+
+    KeyPress(
+			locator1 = "MyTestFile#CUSTOM_HEIGHT",
+			value1 = "\LEFT");
+
+    KeyPress(
+			locator1 = "MyTestFile#CUSTOM_HEIGHT",
+			value1 = "\BACK_SPACE");
+
+    Type(
+			locator1 = "MyTestFile#CUSTOM_HEIGHT",
+			value1 = ${customHeightTwo});
+
+    }
+
+    macro customWidth {
+
+    Click(locator1 = "MyTestFile#CUSTOM_WIDTH");
+
+    Type(
+			locator1 = "MyTestFile#CUSTOM_WIDTH",
+			value1 = ${customWidth});
+
+    KeyPress(
+			locator1 = "MyTestFile#CUSTOM_WIDTH",
+			value1 = "\LEFT");
+
+    KeyPress(
+			locator1 = "MyTestFile#CUSTOM_WIDTH",
+			value1 = "\LEFT");
+
+    KeyPress(
+			locator1 = "MyTestFile#CUSTOM_WIDTH",
+			value1 = "\BACK_SPACE");
+
+    Type(
+			locator1 = "MyTestFile#CUSTOM_WIDTH",
+			value1 = ${customWidthTwo});
+
+    }
+
+    macro assertTheValuesApplied {
+
+        Click(locator1 = "MyTestFile#APPLY_CUSTOM_SIZE");
+
+        Click(locator1 = "MyTestFile#CLOSE_BUTTON");
+
+        Click(locator1 = "MyTestFile#OPEN_SIMULATION");
+
+        Click(locator1 = "MyTestFile#ASSERT_VALUES");
+
+    }
+
+
+    
+}
