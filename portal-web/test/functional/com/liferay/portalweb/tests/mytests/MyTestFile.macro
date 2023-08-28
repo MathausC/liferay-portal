@@ -1,0 +1,9 @@
+    definition {
+        macro assertConfigurationString {
+        Click(locator1 = "MyTestFile#OPEN_GLOBAL_MENU");
+
+        Click(locator1 = "MyTestFile#SWITCH_TO_CONTROL_PANEL");
+
+        Click(locator1 = "MyTestFile#ASSERT_STRING_CONFIGURATION");
+        }
+    }
