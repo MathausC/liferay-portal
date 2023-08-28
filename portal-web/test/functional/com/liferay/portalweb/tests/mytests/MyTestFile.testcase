@@ -1,32 +1,36 @@
 @component-name = "portal-web-forms-and-data-lists"
 definition {
-    property testray.main.component.name = "Forms";
 
-    setUp {
-        TestCase.setUpPortalInstance();
+	property testray.main.component.name = "Forms";
 
-        User.firstLoginPG();
+	setUp {
+		TestCase.setUpPortalInstance();
 
-        Navigator.openURL();
-    }
+		User.firstLoginPG();
 
-    tearDown {
-        User.logoutAndLoginPG(
-            userLoginEmailAddress = "test@liferay.com",
-            userLoginFullName = "Test Test");
-    }
+		Navigator.openURL();
+	}
 
-    @description = "Set Screen size to custom and validate values"
-    @priority = "5"
-    test CanDefineDXPCustomScreenSize {
+	tearDown {
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "test@liferay.com",
+			userLoginFullName = "Test Test");
+	}
 
-        MyTestFile.goToCustomScreen();
+	@description = "Set Screen size to custom and validate values"
+	@priority = 5
+	test CanDefineDXPCustomScreenSize {
+		MyTestFile.goToCustomScreen();
 
-        MyTestFile.customHeight(customHeight = 11, customHeightTwo = 920);
+		MyTestFile.customHeight(
+			customHeight = 11,
+			customHeightTwo = 920);
 
-        MyTestFile.customWidth(customWidth = 10, customWidthTwo = 080);
+		MyTestFile.customWidth(
+			customWidth = 10,
+			customWidthTwo = 080);
 
-        MyTestFile.assertTheValuesApplied();
+		MyTestFile.assertTheValuesApplied();
+	}
 
-    }
 }
