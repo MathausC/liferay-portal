@@ -1,0 +1,56 @@
+<html>
+<head>
+<title>MyTestFile</title>
+</head>
+
+<body>
+<table border="1" cellpadding="1" cellspacing="1">
+<thead>
+<tr><td rowspan="1" colspan="3">MyTestFile</td></tr>
+</thead>
+
+<tbody>
+<tr>
+	<td>OPEN_SIMULATION</td>
+	<td>//button[@data-qa-id='simulation']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_SCREEN</td>
+	<td>//span[text()='Custom']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_HEIGHT</td>
+	<td>//input[@id='_com_liferay_product_navigation_simulation_web_portlet_SimulationPortlet_height']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_WIDTH</td>
+	<td>//input[@id='_com_liferay_product_navigation_simulation_web_portlet_SimulationPortlet_width']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>APPLY_CUSTOM_SIZE</td>
+	<td>//button[@class='w-100 btn btn-secondary']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CLOSE_BUTTON</td>
+	<td>//button[@class='btn btn-monospaced btn-unstyled close sidenav-close' and @aria-label='Close']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSERT_VALUES</td>
+	<td>//div[text()='Custom Size 1920x1080 Applied']</td>
+	<td></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>
+
+
+
+
+
