@@ -1,0 +1,75 @@
+@component-name = "portal-lima"
+definition {
+
+	property testray.main.component.name = "Blogs";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = 1,
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
+		Navigator.gotoPage(pageName = "Blogs Page");
+	}
+
+	tearDown {
+		var testLiferayVirtualInstance = PropsUtil.get("test.liferay.virtual.instance");
+
+		if (${testLiferayVirtualInstance} == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			BlogsEntry.tearDownCP();
+
+			Blogs.tearDownConfigurationDisplaySettingsPG(
+				pageName = "Blogs Page",
+				portletName = "Blogs");
+
+			Blogs.tearDownConfigurationScopePG(
+				pageName = "Blogs Page",
+				portletName = "Blogs");
+
+			PagesAdmin.tearDownCP();
+
+			Site.tearDownCP();
+
+			Organization.tearDownCP();
+
+			JSONUser.tearDownNonAdminUsers();
+
+			ServerAdministration.tearDownMailServerSettings();
+		}
+	}
+
+	@description = "Can Create a Blog"
+	@priority = 5
+	test CanCreateBlog {
+		task ("Given the creation of a new blog") {
+			BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
+		}
+
+		task ("When the user adds a Blog Entry") {
+			Blogs.addEntry(
+				entryContent = "Blogs SDG Content",
+				entryTitle = "Blogs SDG Title");
+		}
+
+		task ("Then the Blog Entry should display on the page") {
+			Navigator.gotoPage(pageName = "Blogs Page");
+
+			BlogsEntry.viewPG(
+				entryContent = "Blogs SDG Content",
+				entryTitle = "Blogs SDG Title");
+		}
+	}
+
+}
