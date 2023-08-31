@@ -1,0 +1,154 @@
+@component-name = "portal-web-forms-and-data-lists"
+definition {
+
+	property testray.main.component.name = "Forms";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		Navigator.openURL();
+	}
+
+	tearDown {
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "test@liferay.com",
+			userLoginFullName = "Test Test");
+	}
+
+	@description = "LRQA-82625 - Write new Form, add entries and check if is possible submit form with two different Languages"
+	@priority = 5
+	test CheckIsPossibleSubmitFormWithTwoDifferentLanguages {
+		task ("Given a form with two fields") {
+			FormsAdmin.addForm();
+
+			Form.editName(formName = "Form 1");
+
+			Form.editDescription(formDescription = "Description 1");
+
+			Form.addTextField(fieldPositionNumber = 0);
+
+			var fieldTextField = FormFields.getFieldName();
+
+			Form.editFieldLabelMetal(fieldValue = "Full Name");
+
+			Form.closeSidebar();
+
+			Form.gotoAddField(
+				fieldPositionNumber = 1,
+				fieldType = "Numeric");
+
+			var fieldNumericField = FormFields.getFieldName();
+
+			Form.editFieldLabelMetal(fieldValue = "Age");
+
+			Form.closeSidebar();
+		}
+
+		task ("and Given the translation into Portuguese of these two fields") {
+			Form.addTranslation(localizedLanguage = "Portuguese (Brazil)");
+
+			FormViewBuilder.editFieldLabel(
+				fieldLabel = "Full Name",
+				label = "Nome Completo");
+
+			Form.closeSidebar();
+
+			FormViewBuilder.editFieldLabel(
+				fieldLabel = "Age",
+				label = "Idade");
+
+			Form.closeSidebar();
+
+			Form.save();
+
+			Form.publishForm();
+		}
+
+		task ("When entries are made in both forms") {
+			FormsAdminNavigator.gotoPublishedForm();
+
+			FormViewBuilder.viewTranslationLanguage(symbolName = "en-US");
+
+			FormViewBuilder.validateFieldLabel(fieldLabel = "Full Name");
+
+			FormViewBuilder.validateFieldLabel(fieldLabel = "Age");
+
+			FormFields.viewTextField(
+				fieldLabel = "Full Name",
+				fieldName = "Full Name");
+
+			FormFields.editText(
+				fieldName = "Full Name",
+				fieldValue = "Abhner Ramos");
+
+			FormFields.viewTextField(
+				fieldLabel = "Age",
+				fieldName = "Age");
+
+			FormFields.editText(
+				fieldName = "Age",
+				fieldValue = 18);
+
+			FormPortlet.submitSuccessfully();
+
+			Form.submitAgain();
+
+			FormViewBuilder.viewTranslationLanguage(symbolName = "en-US");
+
+			FormViewBuilder.validateFieldLabel(fieldLabel = "Full Name");
+
+			FormViewBuilder.validateFieldLabel(fieldLabel = "Age");
+
+			FormViewBuilder.changeAppLanguageTo(changeAppLanguageTo = "en-US");
+
+			FormViewBuilder.changeAppLanguageTo(changeAppLanguageTo = "português-Brasil");
+
+			FormViewBuilder.validateFieldLabel(fieldLabel = "Nome Completo");
+
+			FormViewBuilder.validateFieldLabel(fieldLabel = "Idade");
+
+			FormFields.viewTextField(
+				fieldLabel = "Nome Completo",
+				fieldName = "Nome Completo");
+
+			FormFields.editText(
+				fieldName = "Nome Completo",
+				fieldValue = "Jerson Oliveira");
+
+			FormFields.viewTextField(
+				fieldLabel = "Idade",
+				fieldName = "Idade");
+
+			FormFields.editText(
+				fieldName = "Idade",
+				fieldValue = 950);
+
+			FormPortlet.submitSuccessfully();
+		}
+
+		task ("Then the entries must be seen and validated") {
+			Navigator.openURL();
+
+			ProductMenu.gotoPortlet(
+				category = "Content & Data",
+				portlet = "Forms");
+
+			FormsAdminNavigator.gotoViewEntries();
+
+			LexiconEntry.viewEntryName(rowEntry = "Abhner Ramos");
+
+			LexiconEntry.viewEntryContent(
+				rowAny = 18,
+				rowEntry = "Abhner Ramos");
+
+			LexiconEntry.viewEntryName(rowEntry = "Jerson Oliveira");
+
+			LexiconEntry.viewEntryContent(
+				rowAny = 950,
+				rowEntry = "Jerson Oliveira");
+		}
+	}
+
+}
