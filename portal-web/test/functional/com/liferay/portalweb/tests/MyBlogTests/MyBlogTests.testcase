@@ -1,0 +1,92 @@
+@component-name = "portal-lima"
+definition {
+
+	property testray.main.component.name = "Blogs";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = 1,
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
+		Navigator.gotoPage(pageName = "Blogs Page");
+	}
+
+	tearDown {
+		var testLiferayVirtualInstance = PropsUtil.get("test.liferay.virtual.instance");
+
+		if (${testLiferayVirtualInstance} == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			BlogsEntry.tearDownCP();
+
+			Blogs.tearDownConfigurationDisplaySettingsPG(
+				pageName = "Blogs Page",
+				portletName = "Blogs");
+
+			Blogs.tearDownConfigurationScopePG(
+				pageName = "Blogs Page",
+				portletName = "Blogs");
+
+			PagesAdmin.tearDownCP();
+
+			Site.tearDownCP();
+
+			Organization.tearDownCP();
+
+			JSONUser.tearDownNonAdminUsers();
+
+			ServerAdministration.tearDownMailServerSettings();
+		}
+	}
+
+	@description = "Can Search a Blog"
+	@priority = 5
+	test CanSearchBlogs {
+		task ("Given the creation of a new blog") {
+			BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
+		}
+
+		task ("And Two Blog Entries exists") {
+			Blogs.addEntry(
+				entryContent = "Blogs SDG Content",
+				entryTitle = "Blogs SDG Title");
+
+			Blogs.addEntry(
+				entryContent = "2 Blogs SDG C",
+				entryTitle = "2 Blogs SDG T");
+
+			Navigator.gotoPage(pageName = "Blogs Page");
+
+			BlogsEntry.viewPG(
+				entryContent = "Blogs SDG Content",
+				entryTitle = "Blogs SDG Title");
+
+			BlogsEntry.viewPG(
+				entryContent = "2 Blogs SDG C",
+				entryTitle = "2 Blogs SDG T");
+		}
+
+		task ("When the User searches for Blog Entry 1") {
+			SearchPortlets.searchEmbedded(searchTerm = "\"Blogs SDG Title\"");
+		}
+
+		task ("Then Blog Entry 1 should display And Blog Entry 2 should not display") {
+			SearchResultPortlet.viewSearchResults(
+				searchAssetTitle = "Blogs SDG Title",
+				searchAssetType = "Blogs Entry",
+				searchTerm = "\"Blogs SDG Title\"");
+		}
+	}
+
+}
