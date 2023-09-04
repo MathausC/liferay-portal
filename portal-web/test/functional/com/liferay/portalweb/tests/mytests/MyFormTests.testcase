@@ -12,9 +12,26 @@ definition {
 	}
 
 	tearDown {
-		User.logoutAndLoginPG(
-			userLoginEmailAddress = "test@liferay.com",
-			userLoginFullName = "Test Test");
+		var testLiferayVirtualInstance = PropsUtil.get("test.liferay.virtual.instance");
+
+		if (${testLiferayVirtualInstance} == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			Navigator.openURL();
+
+			ProductMenu.gotoPortlet(
+				category = "Content & Data",
+				portlet = "Forms");
+
+			FormsAdmin.teardownForms();
+
+			Navigator.gotoNavItem(navItem = "Element Sets");
+
+			FormsAdmin.teardownElementSets();
+
+			PagesAdmin.tearDownCP();
+		}
 	}
 
 	@description = "LRQA-82625 - Write new Form, add entries and check if is possible submit form with two different Languages"
@@ -29,8 +46,6 @@ definition {
 
 			Form.addTextField(fieldPositionNumber = 0);
 
-			var fieldTextField = FormFields.getFieldName();
-
 			Form.editFieldLabelMetal(fieldValue = "Full Name");
 
 			Form.closeSidebar();
@@ -39,14 +54,12 @@ definition {
 				fieldPositionNumber = 1,
 				fieldType = "Numeric");
 
-			var fieldNumericField = FormFields.getFieldName();
-
 			Form.editFieldLabelMetal(fieldValue = "Age");
 
 			Form.closeSidebar();
 		}
 
-		task ("and Given the translation into Portuguese of these two fields") {
+		task ("And the translation into Portuguese of these two fields") {
 			Form.addTranslation(localizedLanguage = "Portuguese (Brazil)");
 
 			FormViewBuilder.editFieldLabel(
@@ -81,7 +94,7 @@ definition {
 
 			FormFields.editText(
 				fieldName = "Full Name",
-				fieldValue = "Abhner Ramos");
+				fieldValue = "User Test 1");
 
 			FormFields.viewTextField(
 				fieldLabel = "Age",
@@ -115,7 +128,7 @@ definition {
 
 			FormFields.editText(
 				fieldName = "Nome Completo",
-				fieldValue = "Jerson Oliveira");
+				fieldValue = "User Test 2");
 
 			FormFields.viewTextField(
 				fieldLabel = "Idade",
@@ -137,17 +150,17 @@ definition {
 
 			FormsAdminNavigator.gotoViewEntries();
 
-			LexiconEntry.viewEntryName(rowEntry = "Abhner Ramos");
+			LexiconEntry.viewEntryName(rowEntry = "User Test 1");
 
 			LexiconEntry.viewEntryContent(
 				rowAny = 18,
-				rowEntry = "Abhner Ramos");
+				rowEntry = "User Test 1");
 
-			LexiconEntry.viewEntryName(rowEntry = "Jerson Oliveira");
+			LexiconEntry.viewEntryName(rowEntry = "User Test 2");
 
 			LexiconEntry.viewEntryContent(
 				rowAny = 950,
-				rowEntry = "Jerson Oliveira");
+				rowEntry = "User Test 2");
 		}
 	}
 
