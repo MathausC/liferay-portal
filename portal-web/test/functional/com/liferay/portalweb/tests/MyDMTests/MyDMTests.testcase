@@ -1,0 +1,150 @@
+@component-name = "portal-document-management"
+definition {
+
+	property testray.main.component.name = "Document Management";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Documents and Media Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = 1,
+			groupName = "Guest",
+			layoutName = "Documents and Media Page",
+			widgetName = "Documents and Media");
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if (${testPortalInstance} == "true") {
+			PortalInstances.tearDownCP();
+		}
+	}
+
+	@description = "Can Create a Documents and Media"
+	@priority = 5
+	test CanCreateDM {
+		task ("When the user create a Documents and Media(Upload the file)") {
+			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "Guest");
+
+			DMNavigator.gotoAddDocumentTypeCP(dmDocumentTypeName = "File Upload");
+
+			UploadDependencyFile.uploadFile(fileName = "Document_2.pdf");
+
+			PortletEntry.inputTitle(title = "Document_2.pdf");
+
+			PortletEntry.publish();
+		}
+
+		task ("Then the Documents and Media should display on the page") {
+			Navigator.gotoPage(pageName = "Documents and Media Page");
+
+			DMDocument.viewPG(dmDocumentTitle = "Document_2.pdf");
+		}
+	}
+
+	@description = "Can Delete a Documents and Media"
+	@priority = 5
+	test CanDeleteDM {
+		task ("And create 2 Documents and Media (Upload the file)") {
+			JSONDocument.addFileWithUploadedFile(
+				dmDocumentTitle = "CE",
+				groupName = "Guest",
+				mimeType = "image/jpeg",
+				sourceFileName = "Document_1.jpg");
+
+			JSONDocument.addFileWithUploadedFile(
+				dmDocumentTitle = "DXP",
+				groupName = "Guest",
+				mimeType = "image/jpeg",
+				sourceFileName = "Document_2.jpg");
+
+			Navigator.gotoPage(pageName = "Documents and Media Page");
+		}
+
+		task ("When the User delete a document and media") {
+			DMDocument.deletePG(dmDocumentTitle = "CE");
+		}
+
+		task ("Then DMTest 1 should not exist And DMTest 2 should exist") {
+			DMDocument.viewPG(
+				dmDocumentFileName = "Document_2.jpg",
+				dmDocumentTitle = "DXP");
+		}
+	}
+
+	@description = "Can Download a Documents and Media"
+	@priority = 5
+	test CanDownloadDM {
+		task ("And create 2 Documents and Media (Upload the file)") {
+			JSONDocument.addFileWithUploadedFile(
+				dmDocumentTitle = "CE",
+				groupName = "Guest",
+				mimeType = "image/jpeg",
+				sourceFileName = "Document_1.jpg");
+
+			JSONDocument.addFileWithUploadedFile(
+				dmDocumentTitle = "DXP",
+				groupName = "Guest",
+				mimeType = "image/jpeg",
+				sourceFileName = "Document_2.jpg");
+
+			Navigator.gotoPage(pageName = "Documents and Media Page");
+		}
+
+		task ("When the user download document from DMTest1") {
+			DMDocument.downloadPG(dmDocumentTitle = "CE");
+		}
+
+		task ("Then the file that was downloaded must be from DMTest1") {
+			DMDocument.assertFileNameFromTempFolder(fileName = "Document_1.jpg");
+		}
+
+		task ("And DMTest2 file should not be downloaded") {
+			DMDocument.assertNoFileNameFromTempFolder(fileName = "Document_2.jpg");
+		}
+	}
+
+	@description = "Can Edit a Documents and Media"
+	@priority = 5
+	test CanEditDM {
+		task ("And create a Document and Media (Upload the file)") {
+			JSONDocument.addFileWithUploadedFile(
+				dmDocumentTitle = "SDG",
+				groupName = "Guest",
+				mimeType = "image/jpeg",
+				sourceFileName = "Document_1.jpg");
+
+			Navigator.gotoPage(pageName = "Documents and Media Page");
+		}
+
+		task ("When the User edits the Documents and Media (Change DM name and the file)") {
+			DMDocument.editPG(
+				dmDocumentFileEdit = "Document_2.txt",
+				dmDocumentFileNameEdit = "Document_2.txt",
+				dmDocumentTitle = "SDG",
+				dmDocumentTitleEdit = "SDG Edited");
+
+			Navigator.gotoPage(pageName = "Documents and Media Page");
+		}
+
+		task ("Then the Documents and Media should be edited") {
+			DMDocument.viewPG(
+				dmDocumentFileName = "Document_2.txt",
+				dmDocumentTitle = "SDG Edited");
+		}
+	}
+
+}
