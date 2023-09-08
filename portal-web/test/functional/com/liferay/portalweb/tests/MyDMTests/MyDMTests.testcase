@@ -36,9 +36,11 @@ definition {
 	@description = "Can Create a Documents and Media"
 	@priority = 5
 	test CanCreateDM {
-		task ("When the user create a Documents and Media(Upload the file)") {
+		task ("Given the DM Portlet has been added to the page") {
 			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "Guest");
+		}
 
+		task ("When the user create a Documents and Media(Upload the file)") {
 			DMNavigator.gotoAddDocumentTypeCP(dmDocumentTypeName = "File Upload");
 
 			UploadDependencyFile.uploadFile(fileName = "Document_2.pdf");
@@ -58,9 +60,9 @@ definition {
 	@description = "Can Delete a Documents and Media"
 	@priority = 5
 	test CanDeleteDM {
-		task ("And create 2 Documents and Media (Upload the file)") {
+		task ("Given the creation of 2 Documents and Media (Upload the file)") {
 			JSONDocument.addFileWithUploadedFile(
-				dmDocumentTitle = "CE",
+				dmDocumentTitle = "DM Document JPG1",
 				groupName = "Guest",
 				mimeType = "image/jpeg",
 				sourceFileName = "Document_1.jpg");
@@ -75,10 +77,14 @@ definition {
 		}
 
 		task ("When the User delete a document and media") {
-			DMDocument.deletePG(dmDocumentTitle = "CE");
+			DMDocument.deletePG(dmDocumentTitle = "DM Document JPG1");
 		}
 
-		task ("Then DMTest 1 should not exist And DMTest 2 should exist") {
+		task ("Then DMTest 1 should not exist") {
+			DMDocument.cannotViewCP(dmDocumentTitle = "DM Document JPG1");
+		}
+
+		task ("And DMTest 2 should exist") {
 			DMDocument.viewPG(
 				dmDocumentFileName = "Document_2.jpg",
 				dmDocumentTitle = "DXP");
@@ -88,7 +94,7 @@ definition {
 	@description = "Can Download a Documents and Media"
 	@priority = 5
 	test CanDownloadDM {
-		task ("And create 2 Documents and Media (Upload the file)") {
+		task ("Given the creation of 2 Documents and Media (Upload the file)") {
 			JSONDocument.addFileWithUploadedFile(
 				dmDocumentTitle = "CE",
 				groupName = "Guest",
@@ -120,12 +126,18 @@ definition {
 	@description = "Can Edit a Documents and Media"
 	@priority = 5
 	test CanEditDM {
-		task ("And create a Document and Media (Upload the file)") {
+		task ("Given the creation of 2 a Document and Media (Upload the file)") {
 			JSONDocument.addFileWithUploadedFile(
 				dmDocumentTitle = "SDG",
 				groupName = "Guest",
 				mimeType = "image/jpeg",
 				sourceFileName = "Document_1.jpg");
+
+			JSONDocument.addFileWithUploadedFile(
+				dmDocumentTitle = "DXP",
+				groupName = "Guest",
+				mimeType = "image/jpeg",
+				sourceFileName = "Document_2.jpg");
 
 			Navigator.gotoPage(pageName = "Documents and Media Page");
 		}
@@ -140,10 +152,18 @@ definition {
 			Navigator.gotoPage(pageName = "Documents and Media Page");
 		}
 
-		task ("Then the Documents and Media should be edited") {
+		task ("Then the DMTest1 should be edited") {
 			DMDocument.viewPG(
 				dmDocumentFileName = "Document_2.txt",
 				dmDocumentTitle = "SDG Edited");
+		}
+
+		task ("And DMTest 2 should not edited") {
+			Navigator.gotoPage(pageName = "Documents and Media Page");
+
+			DMDocument.viewPG(
+				dmDocumentFileName = "Document_2.jpg",
+				dmDocumentTitle = "DXP");
 		}
 	}
 
