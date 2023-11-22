@@ -4,11 +4,5 @@
 		"properties": {
 			"accountCartMaxAllowed": 1
 		}
-	},
-	{
-		"pid": "com.liferay.login.web.internal.configuration.AuthLoginConfiguration",
-		"properties": {
-			"promptEnabled": true
-		}
 	}
 ]

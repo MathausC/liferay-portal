@@ -19,6 +19,7 @@ const BaseWarning: React.FC<{children: ReactNode}> = ({children}) => {
 						symbol="exclamation-full"
 					/>
 				</span>
+
 				<span className="font-weight-normal text-paragraph">
 					{children}
 				</span>
@@ -26,4 +27,5 @@ const BaseWarning: React.FC<{children: ReactNode}> = ({children}) => {
 		</ClayLabel>
 	);
 };
+
 export default BaseWarning;

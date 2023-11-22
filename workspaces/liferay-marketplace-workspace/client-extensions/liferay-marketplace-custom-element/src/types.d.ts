@@ -463,9 +463,6 @@ type Industries = {
 };
 
 type UserForm = {
-	accountQuantity: number;
-	accountSelected: Account | undefined;
-	accounts: Account[];
 	agreeToTermsAndConditions: boolean;
 	companyName: string;
 	emailAddress: string;
