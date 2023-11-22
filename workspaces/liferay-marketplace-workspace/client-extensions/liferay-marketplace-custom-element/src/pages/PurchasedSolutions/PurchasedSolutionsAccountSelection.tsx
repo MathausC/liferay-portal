@@ -4,149 +4,262 @@
  */
 
 import ClayButton from '@clayui/button';
-import ClayForm from '@clayui/form';
+import ClayForm, {ClayRadio} from '@clayui/form';
 import ClayLink from '@clayui/link';
+import {useEffect, useState} from 'react';
 
+import emptyPictureIcon from '../../assets/icons/avatar.svg';
 import {Header} from '../../components/Header/Header';
 
 import './PurchasedSolutions.scss';
 
-import {useCallback, useEffect, useState} from 'react';
+import ClaySticker from '@clayui/sticker';
+import classNames from 'classnames';
 
-import {getSiteURL} from '../../components/InviteMemberModal/services';
-import RadioCardList, {
-	RadioCardContent,
-} from '../../components/RadioCardList/RadioCardList';
 import {useMarketplaceContext} from '../../context/MarketplaceContext';
 import {Liferay} from '../../liferay/liferay';
-import {StepType} from './PurchasedSolutions';
-import useAccountForm from './hooks/useAccountForm';
-import useHandleAccount from './hooks/useHandleAccount';
+import {getOrderTypes, postOrder} from '../../utils/api';
 
-type AccountSelectionProps = {
-	accountForm: ReturnType<typeof useAccountForm>;
-	onsubmit: () => Promise<void>;
-	setStep: React.Dispatch<React.SetStateAction<StepType>>;
+type Steps = {
+	page: 'accountCreation' | 'accountSelection' | 'projectCreated';
 };
 
-const AccountSelection: React.FC<AccountSelectionProps> = ({
-	accountForm,
-	onsubmit,
+type PurchasedSolutionsccountSelectionProps = {
+	accounts: Account[];
+	currentUserAccount?: UserAccount;
+	orderInfo?: OrderInfo;
+	setStep: React.Dispatch<Steps>;
+};
+
+const productCustomFields = [
+	'Github Username',
+	'Project Name',
+	'Site Initializer',
+];
+
+const PurchasedSolutionsAccountSelection: React.FC<PurchasedSolutionsccountSelectionProps> = ({
+	accounts,
+	currentUserAccount,
+	orderInfo,
 	setStep,
 }) => {
-	const [accounts, setAccounts] = useState<RadioCardContent<Account>[]>([]);
+	const [radio, setRadio] = useState<RadioOption<Account>>();
+	const [orderType, setOrderType] = useState<OrderType>();
+	const [disabledButton, setDisabledButton] = useState<boolean>(false);
+	const {channel} = useMarketplaceContext();
 
-	const buildContentList = useCallback(() => {
-		setAccounts(
-			accountForm.formUtil.form.accounts.map((account: Account) => ({
-				imageURL: account.logoURL,
-				selected:
-					accountForm.formUtil.form.accountSelected
-						?.externalReferenceCode ===
-					account.externalReferenceCode,
-				title: account.name,
-				value: account,
-			}))
+	const trialLenght =
+		orderInfo?.specifications &&
+		orderInfo?.specifications?.find(
+			(specification) =>
+				specification?.specificationKey === 'trial-length'
 		);
-	}, [accountForm]);
 
-	useEffect(() => {
-		buildContentList();
-	}, [buildContentList]);
-
-	const handleSelectAccount = (radioOption: RadioOption<Account>) => {
-		accountForm.formUtil.setValue('accountSelected', radioOption.value);
-
-		setAccounts((previousValue) =>
-			previousValue.map((account, index) => ({
-				...account,
-				selected: index === radioOption.index,
-			}))
+	const findOrderTypeByName = (
+		orderTypes: OrderType[],
+		nameOrderType = 'SOLUTIONS7'
+	) => {
+		return orderTypes.find(
+			({externalReferenceCode}: OrderType) =>
+				externalReferenceCode === nameOrderType
 		);
 	};
 
-	const handleNextStep = () => {
-		onsubmit();
-		setStep(StepType.CHECKOUT);
+	const fetchDataAndSetState = async () => {
+		const orderTypes = await getOrderTypes();
+
+		if (!channel || !orderTypes.length) {
+			setDisabledButton(true);
+
+			return Liferay.Util.openToast({
+				message:
+					'We are unable to start your trial. Please contact our sales team via email - sales@liferay.com',
+				type: 'danger',
+			});
+		}
+
+		const projectOrderType = findOrderTypeByName(
+			orderTypes,
+			trialLenght?.value?.en_US as string
+		);
+
+		setOrderType(projectOrderType);
+	};
+
+	useEffect(() => {
+		fetchDataAndSetState();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [trialLenght]);
+
+	const customFields =
+		orderInfo?.product?.customFields?.filter((item) =>
+			productCustomFields.find((field) => item.name === field)
+		) || [];
+
+	const getProductCustomFields = () => {
+		let data = {};
+
+		productCustomFields.forEach((fieldName) => {
+			customFields.forEach((field) => {
+				if (field.name === fieldName) {
+					data = {...data, [fieldName]: field.customValue.data};
+				}
+			});
+		});
+
+		return data;
+	};
+
+	const onsubmit = async () => {
+		await postOrder({
+			account: {
+				id: Number(radio?.value?.id),
+				type: radio?.value?.type as string,
+			},
+			accountExternalReferenceCode: radio?.value?.externalReferenceCode,
+			accountId: Number(radio?.value?.id),
+			channel: {
+				currencyCode: channel?.currencyCode,
+				id: channel?.id,
+				type: channel?.type,
+			},
+			channelId: channel?.id,
+			currencyCode: 'USD',
+			customFields: getProductCustomFields(),
+			orderItems: [
+				{
+					id: 0,
+					quantity: 1,
+					skuId: Number(orderInfo?.sku),
+				},
+			],
+			orderStatus: 1,
+			orderTypeExternalReferenceCode: orderType?.externalReferenceCode,
+			orderTypeId: Number(orderType?.id),
+			shippingAmount: 0,
+			shippingWithTaxAmount: 0,
+		});
+
+		setStep({page: 'projectCreated'});
 	};
 
 	return (
-		<div>
-			<span className="d-flex justify-content-center">
-				<Header description title="Account Selection" />
-			</span>
-
-			<div className="mb-4">
-				<span>
-					{`Accounts available for `}
-
-					<strong>{accountForm.formUtil.form?.emailAddress}</strong>
-
-					{` (you)`}
+		<div className="align-items-center d-flex flex-column justify-content-center purchased-solutions-container">
+			<div className="border p-8 purchased-solutions-body rounded">
+				<span className="d-flex justify-content-center">
+					<Header description title="Account Selection" />
 				</span>
-			</div>
 
-			<ClayForm>
-				<ClayForm.Group>
-					<div className="d-flex justify-content-between">
-						<div className="form-group mb-0 pr-3 w-100">
-							<RadioCardList
-								contentList={accounts}
-								leftRadio
-								onSelect={handleSelectAccount}
-								showImage
-							/>
-						</div>
-					</div>
+				<div className="mb-4">
+					<span>
+						{`Accounts available for `}
 
-					<div>
-						<span>Not seeing a specific Account? </span>
+						<strong>{currentUserAccount?.emailAddress}</strong>
 
-						<ClayLink href="http://help.liferay.com/">
-							Contact Support
-						</ClayLink>
-					</div>
+						{` (you)`}
+					</span>
+				</div>
 
-					<div className="mt-6 purchased-solutions-button-container">
-						<div className="align-items-center d-flex justify-content-between w-100">
-							<div>
-								<ClayButton
-									className="font-weight-bold"
-									displayType="unstyled"
-									onClick={() => {
-										window.location.href = `${Liferay.ThemeDisplay.getPortalURL()}${getSiteURL()}/solutions-marketplace`;
-									}}
-								>
-									Cancel
-								</ClayButton>
+				<ClayForm>
+					<ClayForm.Group>
+						<div className="d-flex justify-content-between">
+							<div className="form-group mb-0 pr-3 w-100">
+								{accounts.map((account, index) => (
+									<div
+										className={classNames(
+											'align-items-center d-flex form-control justify-content-between mb-5 cursor-pointer',
+											{
+												fieldchecked:
+													radio?.index === index,
+											}
+										)}
+										key={index}
+										onClick={() =>
+											setRadio({
+												index,
+												value: account,
+											})
+										}
+									>
+										<span className="align-items-center d-flex p-2">
+											<ClaySticker
+												shape="circle"
+												size="lg"
+											>
+												<ClaySticker.Image
+													alt="placeholder"
+													src={
+														account?.logoURL ??
+														emptyPictureIcon
+													}
+												/>
+											</ClaySticker>
+
+											<h5 className="mb-0 ml-3">
+												{account?.name}
+											</h5>
+										</span>
+
+										<div className="pr-4">
+											<ClayRadio
+												checked={radio?.index === index}
+												className="mr-5"
+												onChange={() =>
+													setRadio({
+														index,
+														value: account,
+													})
+												}
+												type="radio"
+												value="um"
+											/>
+										</div>
+									</div>
+								))}
 							</div>
+						</div>
 
-							<div>
-								<ClayButton
-									className="mr-4"
-									displayType="secondary"
-									onClick={() => {
-										setStep(StepType.FORM);
-									}}
-								>
-									Back
-								</ClayButton>
+						<div>
+							<span>Not seeing a specific Account? </span>
+
+							<ClayLink href="http://help.liferay.com/">
+								Contact Support
+							</ClayLink>
+						</div>
+
+						<div className="mt-6 purchased-solutions-button-container">
+							<div className="align-items-center d-flex justify-content-between w-100">
+								<div>
+									<ClayButton
+										className="font-weight-bold"
+										displayType="unstyled"
+										onClick={() => {
+											setStep({
+												page: 'accountCreation',
+											});
+										}}
+									>
+										Cancel
+									</ClayButton>
+								</div>
+
 								<ClayButton
 									disabled={
-										!accountForm.formUtil.form
-											.accountSelected
+										!radio?.value ||
+										disabledButton ||
+										!orderInfo?.sku
 									}
-									onClick={handleNextStep}
+									onClick={() => orderInfo?.sku && onsubmit()}
 								>
 									Continue
 								</ClayButton>
 							</div>
 						</div>
-					</div>
-				</ClayForm.Group>
-			</ClayForm>
+					</ClayForm.Group>
+				</ClayForm>
+			</div>
 		</div>
 	);
 };
 
-export default AccountSelection;
+export default PurchasedSolutionsAccountSelection;
