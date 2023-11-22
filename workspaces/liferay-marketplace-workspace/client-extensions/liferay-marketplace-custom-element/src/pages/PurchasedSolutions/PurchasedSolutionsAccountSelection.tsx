@@ -11,7 +11,7 @@ import {Header} from '../../components/Header/Header';
 
 import './PurchasedSolutions.scss';
 
-import {useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {getSiteURL} from '../../components/InviteMemberModal/services';
 import RadioCardList, {
@@ -25,39 +25,37 @@ import useHandleAccount from './hooks/useHandleAccount';
 
 type AccountSelectionProps = {
 	accountForm: ReturnType<typeof useAccountForm>;
-	onSubmit: (responeAccount?: Account) => Promise<void>;
+	onsubmit: () => Promise<void>;
 	setStep: React.Dispatch<React.SetStateAction<StepType>>;
 };
 
 const AccountSelection: React.FC<AccountSelectionProps> = ({
 	accountForm,
-	onSubmit,
+	onsubmit,
 	setStep,
 }) => {
-	const accountSelected = accountForm.watch('accountSelected');
-	const emailAddress = accountForm.watch('emailAddress');
-	const {mutateMyUserAccount, myUserAccount} = useMarketplaceContext();
+	const [accounts, setAccounts] = useState<RadioCardContent<Account>[]>([]);
 
-	const {formDataTransform, updateAccount} = useHandleAccount({
-		mutateMyUserAccount,
-		myUserAccount,
-	});
-
-	const [accounts, setAccounts] = useState<RadioCardContent<Account>[]>(
-		() => {
-			return accountForm.accounts.map((account: Account) => ({
+	const buildContentList = useCallback(() => {
+		setAccounts(
+			accountForm.formUtil.form.accounts.map((account: Account) => ({
 				imageURL: account.logoURL,
 				selected:
-					accountSelected?.externalReferenceCode ===
+					accountForm.formUtil.form.accountSelected
+						?.externalReferenceCode ===
 					account.externalReferenceCode,
 				title: account.name,
 				value: account,
-			}));
-		}
-	);
+			}))
+		);
+	}, [accountForm]);
+
+	useEffect(() => {
+		buildContentList();
+	}, [buildContentList]);
 
 	const handleSelectAccount = (radioOption: RadioOption<Account>) => {
-		accountForm.setValue('accountSelected', radioOption.value);
+		accountForm.formUtil.setValue('accountSelected', radioOption.value);
 
 		setAccounts((previousValue) =>
 			previousValue.map((account, index) => ({
@@ -67,19 +65,8 @@ const AccountSelection: React.FC<AccountSelectionProps> = ({
 		);
 	};
 
-	const handleNextStep = async () => {
-		const form = {
-			...accountForm.getValues(),
-			accountQuantity: accountForm?.accountQuantity,
-		};
-
-		await updateAccount({
-			accountId: Number(form?.accountSelected?.id),
-			data: formDataTransform(form),
-		});
-
-		await onSubmit();
-
+	const handleNextStep = () => {
+		onsubmit();
 		setStep(StepType.CHECKOUT);
 	};
 
@@ -93,7 +80,7 @@ const AccountSelection: React.FC<AccountSelectionProps> = ({
 				<span>
 					{`Accounts available for `}
 
-					<strong>{emailAddress}</strong>
+					<strong>{accountForm.formUtil.form?.emailAddress}</strong>
 
 					{` (you)`}
 				</span>
@@ -145,7 +132,10 @@ const AccountSelection: React.FC<AccountSelectionProps> = ({
 									Back
 								</ClayButton>
 								<ClayButton
-									disabled={!accountSelected}
+									disabled={
+										!accountForm.formUtil.form
+											.accountSelected
+									}
 									onClick={handleNextStep}
 								>
 									Continue

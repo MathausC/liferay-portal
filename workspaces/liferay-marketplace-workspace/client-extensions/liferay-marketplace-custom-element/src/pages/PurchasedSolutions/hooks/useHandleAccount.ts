@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {KeyedMutator} from 'swr';
-
 import fetcher from '../../../services/fetcher';
 
 type FormType = {
@@ -25,24 +23,25 @@ const accountTypes = {
 	PERSON: 'person',
 };
 
-type HandleAccountProps = {
-	mutateMyUserAccount: KeyedMutator<UserAccount | undefined>;
-	myUserAccount: UserAccount;
-};
-
 const useHandleAccount = ({
-	mutateMyUserAccount,
+	mutateMyUserAccout,
 	myUserAccount,
-}: HandleAccountProps) => {
+}: {
+	mutateMyUserAccout: any;
+	myUserAccount: any;
+}) => {
 	const addUserAccountInAccount = async (data: Account) => {
 		if (myUserAccount && data?.externalReferenceCode) {
 			await fetcher.post(
 				`o/headless-admin-user/v1.0/accounts/by-external-reference-code/${data?.externalReferenceCode}/user-accounts/by-external-reference-code/${myUserAccount.externalReferenceCode}`
 			);
 
-			mutateMyUserAccount((prevMyUserAccount) => prevMyUserAccount, {
-				revalidate: true,
-			});
+			mutateMyUserAccout(
+				(prevMyUserAccount: UserAccount) => prevMyUserAccount,
+				{
+					revalidate: true,
+				}
+			);
 		}
 	};
 
@@ -61,10 +60,9 @@ const useHandleAccount = ({
 	};
 
 	const createAccount = async (data: FormType) => {
-		const response = await fetcher.post<Account>(
-			'o/headless-admin-user/v1.0/accounts',
-			data
-		);
+		const response: Account = await fetcher
+			.post('o/headless-admin-user/v1.0/accounts', data)
+			.catch((error) => console.error(error));
 
 		await addUserAccountInAccount(response);
 
@@ -99,7 +97,31 @@ const useHandleAccount = ({
 			type: accountTypes.PERSON,
 		};
 
-		if (form.accountQuantity >= 1) {
+		if (form.accountQuantity === 1) {
+			delete submitForm.type;
+			delete submitForm.name;
+			delete submitForm.externalReferenceCode;
+
+			return {
+				...submitForm,
+				customFields: [
+					{
+						customValue: {
+							data: form.industry,
+						},
+						name: 'Industry',
+					},
+					{
+						customValue: {
+							data: `${form.phone.code} ${form.phoneNumber} ${form.extension}`,
+						},
+						name: 'Contact Phone',
+					},
+				],
+			};
+		}
+
+		if (form.accountQuantity > 1) {
 			delete submitForm.type;
 			delete submitForm.name;
 			delete submitForm.externalReferenceCode;

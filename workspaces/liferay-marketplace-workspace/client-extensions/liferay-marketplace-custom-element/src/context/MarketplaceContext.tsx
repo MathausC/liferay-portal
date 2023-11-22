@@ -12,16 +12,14 @@ import HeadlessCommerceDeliveryCatalogImpl from '../services/rest/HeadlessCommer
 
 type ContextType = {
 	channel: Channel;
-	mutateMyUserAccount: KeyedMutator<UserAccount | undefined>;
+	mutateMyUserAccout: KeyedMutator<UserAccount | undefined>;
 	myUserAccount: UserAccount;
 	properties: DefaultProperties;
 };
 
 const MarketplaceContext = createContext<ContextType>({
 	channel: {} as Channel,
-	mutateMyUserAccount: ((() => null) as unknown) as KeyedMutator<
-		UserAccount | undefined
-	>,
+	mutateMyUserAccout: {} as any,
 	myUserAccount: {} as UserAccount,
 	properties: {} as DefaultProperties,
 });
@@ -65,7 +63,7 @@ const MarketplaceContextProvider: React.FC<MarketplaceContextProviderProps> = ({
 			value={
 				{
 					channel: marketplaceChannel,
-					mutateMyUserAccount: mutate,
+					mutateMyUserAccout: mutate,
 					myUserAccount,
 					properties,
 				} as ContextType
