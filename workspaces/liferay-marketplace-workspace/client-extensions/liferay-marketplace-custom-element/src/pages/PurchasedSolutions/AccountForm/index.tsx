@@ -77,30 +77,40 @@ const AccountForm: React.FC<AccountFormType> = ({
 	};
 
 	const handleNextStep = async () => {
-		const form = accountForm.getValues();
+		const form = accountForm.watch();
 
-		if (AccountQuantities.SINGLE === accountForm.accountQuantity) {
-			await updateAccount({
-				accountId: Number(form?.accountSelected?.id),
-				data: formDataTransform(form),
-			});
+		switch (accountForm.accountQuantity) {
+			case AccountQuantities.SINGLE: {
+				await updateAccount({
+					accountId: Number(form?.accountSelected?.id),
+					data: formDataTransform(form),
+				});
 
-			await submitOrder();
+				await submitOrder();
 
-			return setStep(StepType.CHECKOUT);
+				setStep(StepType.CHECKOUT);
+
+				break;
+			}
+
+			case AccountQuantities.NO_ACCOUNT: {
+				const response: Account = await createAccount(
+					formDataTransform(form)
+				);
+
+				await submitOrder(response);
+
+				setStep(StepType.CHECKOUT);
+
+				break;
+			}
+
+			default: {
+				setStep(StepType.ACCOUNT);
+
+				break;
+			}
 		}
-
-		if (AccountQuantities.NO_ACCOUNT === accountForm.accountQuantity) {
-			const response: Account = await createAccount(
-				formDataTransform(form)
-			);
-
-			await submitOrder(response);
-
-			return setStep(StepType.CHECKOUT);
-		}
-
-		setStep(StepType.ACCOUNT);
 	};
 
 	const agreeToTermsAndConditions = accountForm.watch(

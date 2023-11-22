@@ -252,7 +252,7 @@ const PurchasedSolutions: React.FC = () => {
 				<div className="border d-flex flex-column justify-content-center p-6 purchased-solutions-body rounded">
 					<div className="d-flex justify-content-center mb-5">
 						{accountForm.accountQuantity >
-							accountForm.SINGLE_ACCOUNT &&
+							accountForm.singleAccount &&
 							step !== StepType.CHECKOUT && (
 								<StepWizard
 									className="col-6"

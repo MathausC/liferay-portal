@@ -12,7 +12,7 @@ import zodSchema from '../../../schema/zod';
 import fetcher from '../../../services/fetcher';
 import {StepType} from '../PurchasedSolutions';
 
-const SINGLE_ACCOUNT = 1;
+const singleAccount = 1;
 
 const useAccountForm = (
 	step: StepType,
@@ -77,7 +77,7 @@ const useAccountForm = (
 		(async () => {
 			const userAccounts = await fetchAccount();
 
-			if (userAccounts.length === SINGLE_ACCOUNT) {
+			if (userAccounts.length === singleAccount) {
 				setValue('accountSelected', userAccounts[0]);
 			}
 
@@ -87,7 +87,6 @@ const useAccountForm = (
 	}, [fetchAccount, myUserAccount, setStep, setValue, step]);
 
 	return {
-		SINGLE_ACCOUNT,
 		accountQuantity,
 		accounts,
 		formState: {errors, isValid},
@@ -96,6 +95,7 @@ const useAccountForm = (
 		register,
 		setAccounts,
 		setValue,
+		singleAccount,
 		watch,
 	};
 };
