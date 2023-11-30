@@ -2,7 +2,11 @@ definition {
 
 	@summary = "Default summary"
 	macro gotoMP2() {
-		Navigator.openSiteURL(siteName = "Marketplace Site");
+		if(!(isSet(siteName))) {
+			siteName = "Marketplace Site";
+		}
+
+		Navigator.openSiteURL(siteName = "${siteName}");
 
 		while ((IsElementPresent(fragmentName = "paragraph", id = "element-text", index = 1, locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT")) && (maxIterations = "1")) {
 			Refresh();

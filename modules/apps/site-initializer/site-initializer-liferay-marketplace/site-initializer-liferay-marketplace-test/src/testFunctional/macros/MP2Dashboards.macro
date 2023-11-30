@@ -122,4 +122,126 @@ definition {
 		AssertElementNotPresent(locator1 = "MP2Dashboards#ANY_DASHBOARD_BUTTON");
 	}
 
+	@summary = "Add a new app via dashboard"
+	macro addNewAppViaDashBoard() {
+		Click(
+			key_text = "New App",	
+			locator1 = "Marketplace#ANY_BUTTON");
+
+		Click(
+			key_text = "Continue",	
+			locator1 = "Marketplace#ANY_BUTTON");
+
+		MP2Dashboards._fulfillAppProfileForm(
+			appImage = ${appImage},
+			categories = ${categories},
+			description = ${description},
+			name = ${name},
+			tags = ${tags});
+		
+		Click(
+			key_text = "Continue",	
+			locator1 = "Marketplace#ANY_BUTTON");
+
+		MP2Dashboards._fulfillAppBuildForm(
+			cloudCompatibility = ${cloudCompatibility},
+			compatibleOfferings = ${compatibleOfferings},
+			zipFile = ${zipFile});
+		
+		Click(
+			key_text = "Continue",	
+			locator1 = "Marketplace#ANY_BUTTON");
+
+		MP2Dashboards._fulfillAppStorefrontForm(table = ${storefrontImages});
+		
+		Click(
+			key_text = "Continue",	
+			locator1 = "Marketplace#ANY_BUTTON");
+	}
+
+	macro _fulfillAppProfileForm {
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			key_field = "file",
+			locator1 = "MP2Dashboards#UPLOAD_FIELD",
+			value1 = ${appImage});
+
+		Type(
+			key_inputLabel = "Name",
+			locator1 = "MP2Dashboards#DASHBOARD_INPUT",
+			value1 = ${name});
+
+		Type(
+			key_inputLabel = "Description",
+			locator1 = "MP2Dashboards#DASHBOARD_INPUT",
+			value1 = ${description});
+
+		for (var categorie : list ${categories}) {
+			Type.sendKeys(
+				key_inputLabel = "Categories",
+				locator1 = "MP2Dashboards#DASHBOARD_REACT_SELECT",
+				value1 = ${categorie});
+
+			KeyPress(
+				key_inputLabel = "Categories",
+				locator1 = "MP2Dashboards#DASHBOARD_REACT_SELECT",
+				value1 = "\ENTER");
+		}
+
+		for (var tag : list ${tags}) {
+			Type.sendKeys(
+				key_inputLabel = "Tags",
+				locator1 = "MP2Dashboards#DASHBOARD_REACT_SELECT",
+				value1 = ${tag});
+
+			KeyPress(
+				key_inputLabel = "Tags",
+				locator1 = "MP2Dashboards#DASHBOARD_REACT_SELECT",
+				value1 = "\ENTER");
+		}
+	}
+
+	macro _fulfillAppBuildForm {
+
+		Click(
+			key_titleText = ${cloudCompatibility},
+			locator1 = "MP2Dashboards#DASHBOARD_RADIO_CARD_BUTTON");
+
+		if(isSet(compatibleOfferings)) {
+			for (var compatibleOffering : list ${compatibleOfferings}) {
+				Check.checkNotVisible(
+					key_checkboxLabel = ${compatibleOffering},
+					locator1 = "MP2Dashboards#DASHBOARD_CHECKBOX");
+			}
+		}
+
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			key_field = "file",
+			locator1 = "MP2Dashboards#UPLOAD_FIELD",
+			value1 = ${zipFile});
+	}
+
+	macro _fulfillAppStorefrontForm {
+		var rawTable = TableUtil.newTable(${table});
+
+		for (var row : table ${rawTable}) {
+			var storefrontImage = "${row[0]}";
+			var storefrontImageDescription = "${row[1]}";
+
+			echo("Imagem sendo upada: ${storefrontImage}");
+
+			UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+				key_field = "file",
+				locator1 = "MP2Dashboards#UPLOAD_FIELD",
+				value1 = ${storefrontImage});
+
+			if(${storefrontImageDescription} != "") {
+				Type(
+					key_imageName = ${storefrontImage},
+					locator1 = "MP2Dashboards#DASHBOARD_STOREFRONT_IMAGE_DESCRIPTION_TEXTBOX",
+					value1 = ${storefrontImageDescription});
+			}
+
+			Click(locator1 = "//body");
+		}
+	}
 }

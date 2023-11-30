@@ -90,24 +90,47 @@ definition {
 			var productName = "QA Product";
 		}
 
-		if (!(isSet(productStatus))) {
-			var productStatus = 0;
-		}
-
 		if (!(isSet(productType))) {
 			var productType = "Virtual";
+		}
+
+		if (!(isSet(skus))) {
+			var skus = '''
+				| TRIAL     | 0   | 0  |
+				| DEVELOPER | 100 | 80 |
+				| STANDARD  | 50  | 40 |
+			''';
 		}
 
 		if (!(isSet(shortDescription))) {
 			var shortDescription = "This is a short description.";
 		}
 
-		CommerceJSONProductsAPI._addCommerceProduct(
+		if(!(isSet(categories))) {
+			var categories = '''
+				| Marketplace App Category              | Analytics and Optimization |
+				| Marketplace App Tags                  | Business Use               |
+				| Marketplace Edition                   | EE                         |
+				| Marketplace Liferay Platform Offering | Self-Managed               |
+				| Marketplace Liferay Platform Offering | Self-Hosted                |
+				| Marketplace Liferay Version           | 7.4                        |
+				| Marketplace Product Type              | App                        |
+			''';
+		}
+
+		if(!(isSet(groupName))) {
+			var groupName = "Marketplace Site";
+		}
+
+		JSONMP2._addCommerceProduct(
 			catalogName = ${catalogName},
+			categories = ${categories},
 			productDescription = ${productDescription},
 			productName = ${productName},
 			productType = ${productType},
-			shortDescription = ${shortDescription});
+			shortDescription = ${shortDescription},
+			skus = ${skus},
+			groupName = ${groupName});
 
 		CommerceJSONOptionsAPI._assignOptionToCommerceProduct(
 			fieldType = ${fieldType},
@@ -115,16 +138,18 @@ definition {
 			optionName = ${optionName},
 			productName = ${productName});
 
-		for (var specificationKeyAndPriority : list "developer-name:0,latest-version:1,license-type:2,price-model:3,type:4") {
-			var specificationKey = StringUtil.extractFirst(${specificationKeyAndPriority}, ":");
-			var priority = StringUtil.extractLast(${specificationKeyAndPriority}, ":");
-
-			CommerceJSONProductsAPI._addCommerceProductSpecifications(
-				priority = ${priority},
-				productName = ${productName},
-				specificationKey = ${specificationKey},
-				value = 0);
+		if(!(isSet(specifications))) {
+			var specifications = '''
+				| Type         | dxp          |
+				| Price Model  | Paid         |
+				| License Type | Subscription |
+				| Supporturl   | localhost    |
+			''';
 		}
+
+		JSONMP2.addSpecificationToMarketplaceApp(
+			specifications = ${specifications},
+			productName = ${productName});
 
 		CommerceProducts.openProductsAdmin();
 
@@ -134,13 +159,378 @@ definition {
 			key_fieldName = "Marketplace Product Type",
 			locator1 = "Button#SELECT_BUTTON");
 
-		AssetCategorization.selectCategories(categoryNameList = "App");
+		//AssetCategorization.selectCategories(categoryNameList = "App");
 
 		Button.clickPublish();
 
 		CommerceEntry.gotoMenuTab(menuTab = "SKUs");
 
 		CommerceSKUs.generateAllSkuCombinations();
+	}
+
+	@summary = "Add specification to Marketplace app"
+	macro addSpecificationToMarketplaceApp(productName = null, specifications = null) {
+		var rawTable = TableUtil.newTable(${specifications});
+
+		for (var row : table  ${rawTable}) {
+			var specificationKey = "${row[0]}";
+			var value = "${row[1]}";
+
+			var specificationKey = StringUtil.replace(${specificationKey}, " ", "-");
+			var specificationKey = StringUtil.lowerCase(${specificationKey});
+
+			CommerceJSONProductsAPI._addCommerceProductSpecifications(
+				priority = 0,
+				productName = ${productName},
+				specificationKey = ${specificationKey},
+				value = ${value});
+		}
+	}
+
+	@summary = "Default summary"
+	macro _addCommerceProduct(specifications = null, productName = null, catalogName = null, replacementSKU = null) {
+		Variables.assertDefined(parameterList = "${catalogName},${productName},${productType}");
+
+		var productType = StringUtil.lowerCase(${productType});
+		var baseURL = ${baseURL};
+
+		if (!(isSet(allowBackOrder))) {
+			var allowBackOrder = "true";
+		}
+
+		if (!(isSet(baseURL))) {
+			var baseURL = JSONCompany.getPortalURL();
+		}
+
+		if (!(isSet(cost))) {
+			var cost = 0;
+		}
+
+		if (!(isSet(depth))) {
+			var depth = 0;
+		}
+
+		if (!(isSet(discontinued))) {
+			var discontinued = "false";
+			var endOfLife = "";
+		}
+		else {
+			if (${discontinued} == "true") {
+				if (!(isSet(endOfLife))) {
+					var endOfLife = DateUtil.getFormattedCurrentDate("yyyy-MM-dd", "UTC");
+
+					echo("Current Date is: ${endOfLife}");
+				}
+			}
+			else {
+				var endOfLife = "";
+			}
+		}
+
+		if (!(isSet(displayAvailability))) {
+			var displayAvailability = "false";
+		}
+
+		if (!(isSet(displayDate))) {
+			var displayDateYear = DateUtil.getCurrentYear();
+
+			var displayDate = "${displayDateYear}-01-01T01:01:00Z";
+		}
+
+		if (!(isSet(displayStockQuantity))) {
+			var displayStockQuantity = "false";
+		}
+
+		if (!(isSet(expirationDate))) {
+			echo("Expiration Date in");
+
+			var displayDateYear = DateUtil.getCurrentYear();
+
+			var displayDateYear = ${displayDateYear} + 1;
+
+			var expirationDate = "${displayDateYear}-01-01T01:01:00Z";
+
+			echo("Expiration Date: ${expirationDate}");
+		}
+
+		if (!(isSet(gtin))) {
+			var gtin = "";
+		}
+
+		if (!(isSet(height))) {
+			var height = 0;
+		}
+
+		if (!(isSet(inventoryEngine))) {
+			var inventoryEngine = "default";
+		}
+
+		if (!(isSet(lowStockAction))) {
+			var lowStockAction = "";
+		}
+
+		if (!(isSet(manufacturerPartNumber))) {
+			var manufacturerPartNumber = "";
+		}
+
+		if (!(isSet(maxOrderQuantity))) {
+			var maxOrderQuantity = 10000;
+		}
+
+		if (!(isSet(metaDescription))) {
+			var metaDescription = "";
+		}
+
+		if (!(isSet(metaKeyword))) {
+			var metaKeyword = "";
+		}
+
+		if (!(isSet(metaTitle))) {
+			var metaTitle = "";
+		}
+
+		if (!(isSet(minOrderQuantity))) {
+			var minOrderQuantity = 1;
+		}
+
+		if (!(isSet(minStockQuantity))) {
+			var minStockQuantity = 0;
+		}
+
+		if (!(isSet(multipleOrderQuantity))) {
+			var multipleOrderQuantity = 1;
+		}
+
+		if (!(isSet(neverExpire))) {
+			var neverExpire = "true";
+		}
+
+		if (isSet(neverExpire)) {
+			var neverExpire = ${neverExpire};
+		}
+
+		if (!(isSet(productDescription))) {
+			var productDescription = "";
+		}
+
+		if (!(isSet(purchasable))) {
+			var purchasable = "true";
+		}
+
+		if (!(isSet(replacementSKU))) {
+			var replacementSkuId = "";
+		}
+		else {
+			var replacementSkuId = CommerceJSONProductsAPI._getSKUId(productSKU = ${replacementSKU});
+		}
+
+		if (!(isSet(shortDescription))) {
+			var shortDescription = "";
+		}
+
+		if (!(isSet(productStatus))) {
+			var productStatus = 0;
+		}
+
+		if (!(isSet(externalReferenceCode))) {
+			var externalReferenceCode = "";
+		}
+
+		var productSpecifications = "";
+
+		if (isSet(specifications)) {
+			var specificationPriority = 0;
+
+			for (var row : list ${specifications}) {
+				var specificationKey = StringUtil.extractFirst(${specificationKeyValue}, ":");
+				var specificationValue = StringUtil.extractLast(${specificationKeyValue}, ":");
+				var specificationKey = CommerceUtilities.convertStringToKey(string = ${specificationKey});
+
+				if (${productSpecifications} != "") {
+					var comma = ",";
+				}
+				else {
+					var comma = "";
+				}
+
+				var productSpecifications = '''
+						${productSpecifications}${comma}
+						{
+							"priority": ${specificationPriority},
+							"specificationKey": "${specificationKey}",
+							"value": {
+								"en_US": "${specificationValue}"
+							}
+						}
+				''';
+				var specificationPriority = ${specificationPriority} + 1;
+			}
+		}
+
+		if (!(isSet(unspc))) {
+			var unspc = "";
+		}
+
+		if (!(isSet(userEmailAddress))) {
+			var userEmailAddress = "test@liferay.com";
+		}
+
+		if (!(isSet(userPassword))) {
+			var userPassword = "test";
+		}
+
+		if (!(isSet(weight))) {
+			var weight = 0;
+		}
+
+		if (!(isSet(width))) {
+			var width = 0;
+		}
+
+		var categoriesData = "";
+
+		if (isSet(categories)) {
+			var rawTable = TableUtil.newTable(${categories});
+			var portalURL = JSONCompany.getPortalURL();
+
+			for (var row : table ${rawTable}) {
+				var vocabularyName = "${row[0]}";
+				var categoryName = "${row[1]}";
+
+				var vocabularyId = TaxonomyCategoryAPI._getTaxonomyVocabularyId(
+					groupName = ${groupName},
+					vocabularyName = ${vocabularyName});
+
+				var vocabularyName = StringUtil.lowerCase(${vocabularyName});
+
+				var curl = '''
+					${portalURL}/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies/${vocabularyId}/taxonomy-categories
+						-u ${userEmailAddress}:${userPassword}
+						-H accept: application/json
+				''';
+
+				var categoryERC = JSONCurlUtil.get(${curl}, "$.items[?(@.name=='${categoryName}')].externalReferenceCode");
+				var categoryId = JSONCurlUtil.get(${curl}, "$.items[?(@.name=='${categoryName}')].id");
+
+				if (${categoriesData} != "") {
+					var categoriesData = "${categoriesData},";
+				}
+
+				var categoriesData = '''
+					${categoriesData}
+					{
+						"externalReferenceCode": "${categoryERC}",
+						"id": "${categoryId}",
+						"name": "${categoryName}",
+						"vocabulary": "${vocabularyName}"
+					}''';
+			}
+		}
+
+		var skus = TableUtil.newTable(${skus});
+
+		var skuData = "";
+
+		for (var row : table ${skus}) {
+			var sku = "${row[0]}";
+			var price = "${row[1]}";
+			var promoPrice = "${row[2]}";
+
+			if(${skuData} != "") {
+				var skuData = "${skuData},";
+			}
+
+			var skuData = '''${skuData}
+			{
+				"cost": "${cost}",
+				"depth": "${depth}",
+				"discontinued": "${discontinued}",
+				"discontinuedDate": "${endOfLife}",
+				"gtin": "${gtin}",
+				"height": "${height}",
+				"manufacturerPartNumber": "${manufacturerPartNumber}",
+				"neverExpire": true,
+				"price": ${price},
+				"promoPrice": ${promoPrice},
+				"published": true,
+				"purchasable": "${purchasable}",
+				"replacementSkuId": "${replacementSkuId}",
+				"sku": "${sku}",
+				"unspsc": "${unspc}",
+				"weight": "${weight}",
+				"width": "${width}"
+			}''';
+		}
+
+		var catalogId = CommerceJSONCatalogsAPI._getCommerceCatalogIdByName(
+			baseURL = ${baseURL},
+			catalogName = ${catalogName},
+			userEmailAddress = ${userEmailAddress});
+
+		var curl = '''
+			${baseURL}/o/headless-commerce-admin-catalog/v1.0/products \
+				-u ${userEmailAddress}:${userPassword} \
+				-H 'accept: application/json' \
+				-H 'Content-Type: application/json' \
+				-d '{
+					"active": true,
+					"catalogId": "${catalogId}",
+					"categories": [${categoriesData}],
+					"customFields": [],
+					"description": {
+						"en_US": "${productDescription}"
+					},
+					"displayDate": "${displayDate}",
+					"expando": {},
+					"expirationDate": "${expirationDate}",
+					"externalReferenceCode": "${externalReferenceCode}",
+					"metaDescription": {
+						"en_US": "${metaDescription}"
+					},
+					"metaKeyword": {
+						"en_US": "${metaKeyword}"
+					},
+					"metaTitle": {
+						"en_US": "${metaTitle}"
+					},
+					"name": {
+						"en_US": "${productName}"
+					},
+					"neverExpire": "${neverExpire}",
+					"productAccountGroupFilter": false,
+					"productChannelFilter": false,
+					"productStatus": "${productStatus}",
+					"productType": "${productType}",
+					"shortDescription": {
+						"en_US": "${shortDescription}"
+					},
+					"productConfiguration": {
+						"allowBackOrder": ${allowBackOrder},
+						"allowedOrderQuantities": [],
+						"displayAvailability": ${displayAvailability},
+						"displayStockQuantity": ${displayStockQuantity},
+						"inventoryEngine": "${inventoryEngine}",
+						"lowStockAction": "${lowStockAction}",
+						"maxOrderQuantity": ${maxOrderQuantity},
+						"minOrderQuantity": ${minOrderQuantity},
+						"minStockQuantity": ${minStockQuantity},
+						"multipleOrderQuantity": ${multipleOrderQuantity}
+					},
+					"productSpecifications": [${productSpecifications}],
+					"shippingConfiguration": {
+						"freeShipping": false
+					},
+					"skus": [ ${skuData} ],
+					"tags": [],
+					"workflowStatusInfo": {
+						"code": 0,
+						"label": "approved",
+						"label_i18n": "Approved"
+					}
+				}'
+		''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
 	}
 
 	@summary = "Default summary"

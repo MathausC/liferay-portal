@@ -1,0 +1,111 @@
+@component-name = "portal-liferay-online"
+definition {
+
+	property osgi.modules.includes = "site-initializer-liferay-marketplace";
+	property portal.release = "false";
+	property portal.upstream = "true";
+	property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
+	property test.liferay.virtual.instance = "true";
+	property test.smtp.server.enabled = "true";
+	property testray.main.component.name = "Site Initializer Liferay Marketplace";
+
+	var testSiteName = "Marketplace";
+	var testSiteURL = "marketplace";
+
+    setUp {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "test@liferay.com",
+				userLoginFullName = "Test Test");
+
+			MP2Navigator.gotoMP2(siteName = ${testSiteName});
+
+			JSONMP2.addMKTProduct(
+				catalogName = "Acme Development",
+				categories = '''
+					| Marketplace App Category              | Analytics and Optimization |
+					| Marketplace App Tags                  | Business Use               |
+					| Marketplace Edition                   | EE                         |
+					| Marketplace Liferay Platform Offering | Self-Managed               |
+					| Marketplace Liferay Platform Offering | Self-Hosted                |
+					| Marketplace Liferay Version           | 7.4                        |
+					| Marketplace Product Type              | App                        |
+				''',
+				groupName = ${testSiteName},
+				productName = "Test Name App One",
+				specifications = '''
+					| Type         | dxp          |
+					| Price Model  | Paid         |
+					| License Type | Subscription |
+					| Supporturl   | localhost    |
+				''');
+
+			JSONMP2.addMKTProduct(
+				catalogName = "Acme Development",
+				categories = '''
+					| Marketplace App Category              | Content Management & Operations |
+					| Marketplace App Tags                  | Client Extension Type           |
+					| Marketplace Edition                   | EE                              |
+					| Marketplace Liferay Platform Offering | Fully-Managed                   |
+					| Marketplace Liferay Version           | 7.4                             |
+					| Marketplace Product Type              | App                             |
+				''',
+				groupName = ${testSiteName},
+				productName = "Test Name App Two",
+				specifications = '''
+					| Type         | cloud     |
+					| Price Model  | Paid      |
+					| License Type | Perpetual |
+					| Supporturl   | localhost |
+				''');
+
+			JSONMP2.addMKTProduct(
+				catalogName = "Acme Development",
+				categories = '''
+					| Marketplace App Category              | Analytics and Optimization |
+					| Marketplace App Category              | Customer Data Management   |
+					| Marketplace App Tags                  | Client Extension Type      |
+					| Marketplace Edition                   | EE                         |
+					| Marketplace Liferay Platform Offering | Self-Managed               |
+					| Marketplace Liferay Version           | 7.4                        |
+					| Marketplace Product Type              | App                        |
+				''',
+				groupName = ${testSiteName},
+				productName = "Test Name App Three",
+				specifications = '''
+					| Type         | cloud        |
+					| Price Model  | Free         |
+					| License Type | Subscription |
+					| Supporturl   | localhost    |
+				''');
+    }
+
+    tearDown {
+        echo("tearDown");
+		//MP2Configuration.marketplaceInitializersTearDown(doLogout = "true");
+    }
+
+	@description = "ISSD-1832 | Assert the functionality of the search bar"
+	@priority = 5
+	test SearchForApp {
+		task("Given the creation of diferent apps") {
+			MP2Navigator.openSitePage(
+                pageName = "Publisher Dashboard",
+                siteName = "Marketplace");
+
+			// MP2Dashboards.addNewAppViaDashBoard(
+            //     appImage = "Document_4.jpg",
+            //     categories = "Analytics and Optimization,Customer Data Management",
+            //     cloudCompatibility = "No",
+            //     compatibleOfferings = "Self-Hosted,Self-Managed",
+            //     description = "Test App Description",
+            //     name = "Test App",
+            //     tags = "Business Use,Client Extension Type",
+            //     zipFile = "Document_1.zip",
+			// 	storefrontImages = '''
+			// 		| Document_1.jpg | Storefront Image 1 Description |
+			// 		| Document_2.jpg | Storefront Image 2 Description |
+			// 	'''
+			// 	);
+		}
+	}
+}

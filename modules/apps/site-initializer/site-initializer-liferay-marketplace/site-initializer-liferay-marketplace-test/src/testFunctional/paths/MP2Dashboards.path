@@ -62,7 +62,7 @@
 </tr>
 <tr>
 	<td>UPLOAD_FIELD</td>
-	<td>//input[@name='${key_field}']</td>
+	<td>//input[@name='${key_field}'] | //input[@type='file']</td>
 	<td></td>
 </tr>
 <tr>
@@ -70,7 +70,36 @@
 	<td>//button[contains(@class, 'resend-invitation')]</td>
 	<td></td>
 </tr>
-
+<tr>
+	<td>DASHBOARD_INPUT</td>
+	<td>//*[@class='field-base-container_label' and contains(*, '${key_inputLabel}')]/parent::*/following-sibling::*[contains(@class, 'custom-input')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DASHBOARD_REACT_SELECT</td>
+	<td>//*[@class='field-base-container_label' and contains(*, '${key_inputLabel}')]/parent::*/following-sibling::*//*[contains(@id, 'input')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DASHBOARD_RADIO_CARD_BUTTON</td>
+	<td>//*[@class='radio-card-title-text' and text()='${key_titleText}']/preceding-sibling::*[@class='radio-card-button']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DASHBOARD_CHECKBOX</td>
+	<td>//*[text()='${key_checkboxLabel}']/parent::*/preceding-sibling::*//*[@class='custom-control-input']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DASHBOARD_STOREFRONT_IMAGE_DESCRIPTION_TEXTBOX</td>
+	<td>//*[@class='image-file-item-info-content-text' and text()='${key_imageName}']/../following-sibling::*//input</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 </tbody>
 </table>
 </body>

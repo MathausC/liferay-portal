@@ -147,18 +147,18 @@ definition {
 	macro marketplaceInitializersTearDown() {
 		var companyWebId = JSONCompany.getWebId();
 
-		if (isSet(clientExtension)) {
-			var clientExtension = "liferay-marketplace-custom-element";
+		// if (isSet(clientExtension)) {
+		// 	var clientExtension = "liferay-marketplace-custom-element";
 
-			AntCommands.runCommand("build-test-workspace.xml", "undeploy-workspace-client-extension -Dvirtual.instance.id=${companyWebId} -Dworkspace.client.extension.name=${clientExtension}");
-		}
+		// 	AntCommands.runCommand("build-test-workspace.xml", "undeploy-workspace-client-extension -Dvirtual.instance.id=${companyWebId} -Dworkspace.client.extension.name=${clientExtension}");
+		// }
 
-		var testLiferayVirtualInstance = PropsUtil.get("test.liferay.virtual.instance");
+		// var testLiferayVirtualInstance = PropsUtil.get("test.liferay.virtual.instance");
 
-		if (${testLiferayVirtualInstance} == "true") {
-			PortalInstances.tearDownCP();
-		}
-		else {
+		// if (${testLiferayVirtualInstance} == "true") {
+		// 	PortalInstances.tearDownCP();
+		// }
+		// else {
 			Navigator.openURL();
 
 			User.logoutAndLoginPG(
@@ -192,7 +192,7 @@ definition {
 			if (isSet(doLogout)) {
 				User.logoutPG();
 			}
-		}
+		// }
 	}
 
 	@summary = "Default summary"
@@ -201,14 +201,14 @@ definition {
 
 		User.firstLoginPG();
 
-		if (${clientExtensionDeploy} == "true") {
-			var companyWebId = JSONCompany.getWebId();
-			var clientExtension = "liferay-marketplace-custom-element";
+		// if (${clientExtensionDeploy} == "true") {
+		// 	var companyWebId = JSONCompany.getWebId();
+		// 	var clientExtension = "liferay-marketplace-custom-element";
 
-			AntCommands.runCommand("build-test-workspace.xml", "deploy-workspace-client-extension -Dvirtual.instance.id=${companyWebId} -Dworkspace.client.extension.name=${clientExtension}");
+		// 	AntCommands.runCommand("build-test-workspace.xml", "deploy-workspace-client-extension -Dvirtual.instance.id=${companyWebId} -Dworkspace.client.extension.name=${clientExtension}");
 
-			WaitForConsoleTextPresent(value1 = "STARTED liferaymarketplacecustomelement");
-		}
+		// 	WaitForConsoleTextPresent(value1 = "STARTED liferaymarketplacecustomelement");
+		// }
 
 		// This addition should be reverted when the issue ISSD-1572 is completed and the macro HeadlessSite.addSite() is usable.
 

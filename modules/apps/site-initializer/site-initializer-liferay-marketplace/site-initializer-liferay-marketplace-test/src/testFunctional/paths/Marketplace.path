@@ -18,6 +18,16 @@
 	<td>//*[contains(@class,'heading') and contains(.,'${key_title}')]</td>
 	<td></td>
 </tr>
+<tr>
+	<td>ANY_BUTTON</td>
+	<td>//*[contains(@type, 'button') and text()='${key_text}'] | //*[contains(@type, 'button')]//*[text()='${key_text}'] | //*[contains(@class, 'button')]//*[text()='${key_text}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 </tbody>
 </table>
 </body>
